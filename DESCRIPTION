@@ -1,14 +1,11 @@
 Package: mstPackage
 Type: Package
-Title: Implementation of an Rcpp Package for Minimum Spanning Tree Algorithm
+Title: What the Package Does in One 'Title Case' Line
 Version: 1.0
-Date: 2024-04-11
-Author: Rabab Khatib, Gabriele Pedroni, Nawal Bendjelloul
-Maintainer: Rabab Khatib <rababkhatibb@gmail.com>, Gabriele Pedroni <gabriele.pedroni@mail.polimi.it>, Nawal Bendjelloul <nawal.bendjelloul01@gmail.com>
-Description: A COMPLETER 
-    Use four spaces when indenting paragraphs within the Description.
-License: GPL-3
-Encoding: UTF-8
-Imports: Rcpp (>= 1.0.5)
+Date: 2024-04-07
+Author: Your Name
+Maintainer: Your Name <your@email.com>
+Description: One paragraph description of what the package does as one or more full sentences.
+License: GPL (>= 2)
+Imports: Rcpp (>= 1.0.12)
 LinkingTo: Rcpp
-RoxygenNote: 7.1.1
