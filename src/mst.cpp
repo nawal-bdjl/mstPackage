@@ -1,7 +1,13 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
-// Find the vertex with minimum key value that is not yet in the MST
+//' Find the vertex with minimum key value that is not yet in the MST
+//'
+//' @param key NumericVector containing the key values of vertices
+//' @param mst_set LogicalVector indicating whether vertices are already in the MST
+//' @return Index of the vertex with the minimum key value
+//' @export
+// [[Rcpp::export]]
 int min_key_vertex(NumericVector key, LogicalVector mst_set) {
   int min_index = -1;
   // Initialize min_key to +inf
@@ -22,6 +28,11 @@ int min_key_vertex(NumericVector key, LogicalVector mst_set) {
 }
 
 // Generate a random adjacency matrix
+//'
+//' @param n Integer specifying the number of vertices
+//' @param num_zeros Nullable integer specifying the number of zero-weight edges to introduce
+//' @return NumericMatrix representing the weighted adjacency matrix
+//' @export
 // [[Rcpp::export]]
 NumericMatrix generate_random_adjacency_matrix(int n, Nullable<int> num_zeros = R_NilValue) {
   // Initialize a symmetric matrix
@@ -52,7 +63,8 @@ NumericMatrix generate_random_adjacency_matrix(int n, Nullable<int> num_zeros = 
   return symmetric_matrix;
 }
 
-// Find the Minimum Spanning Tree using Prim's algorithm
+//' Find the Minimum Spanning Tree using Prim's algorithm
+//'
 //' @param adj_matrix Weighted adjacency matrix
 //' @return Weighted adjacency matrix of the Minimum Spanning Tree
 // [[Rcpp::export]]
@@ -92,7 +104,8 @@ NumericMatrix prim_mst_rcpp(NumericMatrix adj_matrix) {
   return mst;
 }
 
-// Find the Minimum Spanning Tree using Kruskal's algorithm
+//' Find the Minimum Spanning Tree using Kruskal's algorithm
+//'
 //' @param adj_matrix Weighted adjacency matrix
 //' @return Weighted adjacency matrix of the Minimum Spanning Tree
 // [[Rcpp::export]]
@@ -156,7 +169,8 @@ NumericMatrix kruskal_mst_rcpp(NumericMatrix adj_matrix) {
   return mst_edges;
 }
 
-// Convert an adjacency matrix into a list of edges (source, destination, weight)
+//' Convert an adjacency matrix into a list of edges (source, destination, weight)
+//'
 //' @param adj_matrix Weighted adjacency matrix
 //' @return Matrix of edges (source, destination, weight)
 // [[Rcpp::export]]
