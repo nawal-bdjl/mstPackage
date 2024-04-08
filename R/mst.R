@@ -1,5 +1,3 @@
-library(igraph)
-
 #' Generate weighted adjacency matrix of a graph with given number of vertices
 #' 
 #' @param n Number of vertices
