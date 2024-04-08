@@ -1,0 +1,44 @@
+---
+title: "Mst package"
+author: "Nawal Bendjelloul"
+date: "2024-04-07"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# MST Package
+
+## Introduction
+
+....
+
+## L'algorithme de Prim
+
+### Présentation
+
+L'**algorithme de Prim**, popularisé par Prim en 1957, est un algorithme de graphes trouvant un **arbre couvrant minimal** pour un graphe connexe pondéré non dirigé.\
+Son objectif est de connecter tous les sommets du graphe avec les arêtes de poids minimal possible, sans former de cycle, pour que le poids total de l'arbre couvrant minimal soit le plus bas possible.
+
+### Le principe
+
+L'algorithme de Prim commence par un **sommet arbitraire** et s'étend étape par étape jusqu'à couvrir tous les sommets du graphe. À chaque étape, il ajoute l'**arête de poids minimal** **disponible** qui connecte un sommet de l'arbre en construction à un sommet en dehors de l'arbre.
+
+### Etape de l'algorithme
+
+1.  **Initialisation** : Sélectionner un sommet de départ arbitraire du graphe.
+2.  **Sélection des Arêtes** : À partir du sommet sélectionné, choisir l'arête de poids minimal qui connecte un sommet déjà dans l'arbre à un sommet qui n'est pas encore dans l'arbre.
+3.  **Ajout à l'Arbre** : Ajouter le sommet sélectionné à l'arbre, ainsi que l'arête choisie.
+4.  **Répétition** : Répéter les étapes 2 et 3 jusqu'à ce que tous les sommets soient inclus dans l'arbre.
+
+### Exemple d'application de l'algorithme
+
+![](images/clipboard-3144098367.png)
+
+### Propriétés
+
+-   **Greedy Algorithm** : à chaque étape, il fait le choix optimal local dans l'espoir que ce choix conduira à une solution optimale globale.
+
+-   **Indépendant du Sommet de Départ** : peu importe le sommet de départ, l'algorithme trouve toujours le même arbre couvrant minimal. Cela montre la fiabilité de l'algorithme pour fournir un résultat consistant et optimal indépendamment de sommet initial choisi.
