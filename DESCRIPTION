@@ -5,7 +5,7 @@ Version: 1.0
 Date: 2024-04-11
 Author: Rabab Khatib, Gabriele Pedroni, Nawal Bendjelloul
 Maintainer: Rabab Khatib <rababkhatibb@gmail.com>, Gabriele Pedroni <gabriele.pedroni@mail.polimi.it>, Nawal Bendjelloul <nawal.bendjelloul01@gmail.com>
-Description: Nawal Bendjelloul blablabla a revoir et a modifier c'est pour un test.
+Description: This package provides an implementation of two minimum spanning tree algorithms, Prim's algorithm and Kruskal's algorithm, using both Rcpp and R. The package allows for the comparison of the performance of these two algorithms, as well as a comparison of the two programming languages in the context of these algorithms. The package is intended for use in graph theory and network analysis, and provides efficient and reliable solutions for minimum spanning tree problems.
 License: GPL-3
 Encoding: UTF-8
 Imports: Rcpp (>= 1.0.12)
