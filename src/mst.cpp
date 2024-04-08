@@ -148,7 +148,6 @@ NumericMatrix kruskal_mst_rcpp(NumericMatrix adj_matrix) {
 
   // Initialize mst matrix and weights
   NumericMatrix mst_edges(num_vertices, num_vertices);
-  double mst_weight = 0;
 
   // Kruskal's Algorithm
   for (const auto& edge : edges) {
@@ -159,8 +158,6 @@ NumericMatrix kruskal_mst_rcpp(NumericMatrix adj_matrix) {
       // Add the edge to the MST
       mst_edges(u, v) = edge[2];
       mst_edges(v, u) = edge[2];
-      // Update the MST weight
-      mst_weight += edge[2];
       // Merge the sets
       union_sets(u, v);
     }
