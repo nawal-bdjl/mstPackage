@@ -40,7 +40,7 @@ NumericMatrix generate_random_adjacency_matrix(int n, Nullable<int> num_zeros = 
   // Fill the symm matrix with random numbers, keeping the symmetry
   for (int i = 0; i < n; i++) {
     for (int j = i; j < n; j++) {
-      symmetric_matrix(i, j) = symmetric_matrix(j, i) = rand() % 10 + 1;
+      symmetric_matrix(i, j) = symmetric_matrix(j, i) = R::runif(1, 11);
     }
   }
 
@@ -54,8 +54,8 @@ NumericMatrix generate_random_adjacency_matrix(int n, Nullable<int> num_zeros = 
   if (num_zeros.isNotNull()) {
     int num_zeros_val = as<int>(num_zeros);
     for (int i = 0; i < num_zeros_val; i++) {
-      int row_index = rand() % n;
-      int col_index = rand() % n;
+      int row_index = R::runif(0, n);
+      int col_index = R::runif(0, n);
       symmetric_matrix(row_index, col_index) = symmetric_matrix(col_index, row_index) = R_PosInf;
     }
   }
