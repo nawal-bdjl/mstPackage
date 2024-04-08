@@ -12,7 +12,7 @@ int min_key_vertex(NumericVector key, LogicalVector mst_set) {
   int min_index = -1;
   // Initialize min_key to +inf
   double min_key = R_PosInf;
-  
+
   // Loop over vertexes
   for (int v = 0; v < key.size(); v++) {
     // Check if the vertex is not yet in the MST and its key is smaller than the current minimum key
@@ -22,7 +22,7 @@ int min_key_vertex(NumericVector key, LogicalVector mst_set) {
       min_index = v;
     }
   }
-  
+
   // Return the index of the vertex with the minimum key
   return min_index;
 }
@@ -48,7 +48,7 @@ NumericMatrix generate_random_adjacency_matrix(int n, Nullable<int> num_zeros = 
   for (int i = 0; i < n; i++) {
     symmetric_matrix(i, i) = R_PosInf;
   }
-  
+
   // This piece of code makes sure that the graph is not complete; we take some pairs of edges at
   // random and we set their distance to +inf, effectively "disconnetting them"
   if (num_zeros.isNotNull()) {
@@ -59,7 +59,7 @@ NumericMatrix generate_random_adjacency_matrix(int n, Nullable<int> num_zeros = 
       symmetric_matrix(row_index, col_index) = symmetric_matrix(col_index, row_index) = R_PosInf;
     }
   }
-  
+
   return symmetric_matrix;
 }
 
@@ -77,13 +77,13 @@ NumericMatrix prim_mst_rcpp(NumericMatrix adj_matrix) {
   // Initialize "mst_set" array with false values
   LogicalVector mst_set(n, false);
   key[0] = 0;
-  
+
   // Loop over vertexes
   for (int count = 0; count < n - 1; count++) {
     // Find the vertex with the minimum key value and add it to the mst set
     int u = min_key_vertex(key, mst_set);
     mst_set[u] = true;
-    
+
     // Update the key values of adjacent vertices if they are not yet in the MST and have smaller key values
     for (int v = 0; v < n; v++) {
       if (adj_matrix(u, v) != 0 && !mst_set[v] && adj_matrix(u, v) < key[v]) {
@@ -92,7 +92,7 @@ NumericMatrix prim_mst_rcpp(NumericMatrix adj_matrix) {
       }
     }
   }
-  
+
   // Initialize the mst matrix
   NumericMatrix mst(n, n);
   // Fill the mst matrix with edges
@@ -100,7 +100,7 @@ NumericMatrix prim_mst_rcpp(NumericMatrix adj_matrix) {
     mst(parent[v], v) = adj_matrix(parent[v], v);
     mst(v, parent[v]) = adj_matrix(parent[v], v);
   }
-  
+
   return mst;
 }
 
@@ -111,7 +111,7 @@ NumericMatrix prim_mst_rcpp(NumericMatrix adj_matrix) {
 // [[Rcpp::export]]
 NumericMatrix kruskal_mst_rcpp(NumericMatrix adj_matrix) {
   int num_vertices = adj_matrix.nrow();
-  
+
   // Find edges and their weights from the adjacency matrix
   std::vector<std::vector<double>> edges;
   for (int i = 0; i < num_vertices; i++) {
@@ -121,16 +121,16 @@ NumericMatrix kruskal_mst_rcpp(NumericMatrix adj_matrix) {
       }
     }
   }
-  
+
   // Sort edges based on weight
   std::sort(edges.begin(), edges.end(), [](const std::vector<double>& a, const std::vector<double>& b) {
     return a[2] < b[2];
   });
-  
+
   // Initialize parent array
   std::vector<int> parent(num_vertices);
   std::iota(parent.begin(), parent.end(), 0);
-  
+
   // Function to find the root of a node
   auto find_root = [&](int node) {
     while (parent[node] != node) {
@@ -138,18 +138,18 @@ NumericMatrix kruskal_mst_rcpp(NumericMatrix adj_matrix) {
     }
     return node;
   };
-  
+
   // Function to perform union of two sets
   auto union_sets = [&](int x, int y) {
     int root_x = find_root(x);
     int root_y = find_root(y);
     parent[root_x] = root_y;
   };
-  
-  // Initialize mst matrix and weights 
+
+  // Initialize mst matrix and weights
   NumericMatrix mst_edges(num_vertices, num_vertices);
   double mst_weight = 0;
-  
+
   // Kruskal's Algorithm
   for (const auto& edge : edges) {
     int u = edge[0];
@@ -165,7 +165,7 @@ NumericMatrix kruskal_mst_rcpp(NumericMatrix adj_matrix) {
       union_sets(u, v);
     }
   }
-  
+
   return mst_edges;
 }
 
@@ -179,7 +179,7 @@ NumericMatrix adj_matrix_to_edges(NumericMatrix adj_matrix) {
   // Initialize the edges matrix
   NumericMatrix edges(num_vertices * num_vertices, 3);
   int count = 0;
-  
+
   // Iterate over each pair of vertices
   for (int i = 0; i < num_vertices; i++) {
     for (int j = i + 1; j < num_vertices; j++) {
@@ -196,7 +196,7 @@ NumericMatrix adj_matrix_to_edges(NumericMatrix adj_matrix) {
       }
     }
   }
-  
+
   // Resize the edges matrix to remove unused rows
   edges = edges(Range(0, count - 1), _);
   return edges;
