@@ -1,5 +1,3 @@
-[![Build Status](https://github.com/nawal-bdjl/mstPackage)]
-
 # MST Package Vignette
 
 ### Nawal BENDJELLOUL, Rabab KHATIB, Gabriele PEDRONI
