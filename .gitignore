@@ -1,2 +1,5 @@
-simulations/
+.Rhistory
+*~
 .Rproj.user
+*.o
+*.so
