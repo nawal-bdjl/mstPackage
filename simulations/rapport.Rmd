@@ -9,13 +9,29 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# MST Package
+# MST Package 
 
 ## Introduction
 
-....
+### Contexte - Principe 
 
-## L'algorithme de Prim
+Le Minimum Spanning Tree (MST) est un arbre couvrant de poids minimal d'un graphe connexe et pondéré. Il s'agit d'un sous-graphe acyclique qui relie tous les sommets du graphe original en minimisant la somme des poids des arêtes.
+
+Il existe plusieurs algorithmes classiques pour trouver le MST d'un graphe, tels que l'algorithme de Kruskal et l'algorithme de Prim que nous avons choisi d'implementer ici. Ces algorithmes reposent sur des stratégies différentes pour sélectionner les arêtes à inclure dans l'arbre couvrant, mais ils garantissent tous les deux de trouver une solution optimale.
+
+Ce package se veut notamment de résoudre efficacement des problèmes de MST sur des graphes de grande taille, spécifiques à la modélisation dans le domaine de la santé.
+
+### Applications 
+
+Le MST a de nombreuses applications en santé, notamment dans l'analyse de données génomiques et protéomiques [étude à grande échelle des protéines]. Parmi les exemples d'applications en santé nous pouvons citer :
+
+-   La **reconstruction de génomes** d'organismes à partir de fragments d'ADN. En utilisant un graphe dont les sommets représentent les fragments d'ADN et les arêtes représentent les chevauchements entre les fragments, le MST permet de trouver le chemin le plus court qui relie tous les fragments, ce qui correspond au génome complet de l'organisme.
+
+-   L'**analyse de réseaux métaboliques**, en représentant par les sommets les métabolites et par les arêtes les réactions chimiques entre eux. Le MST peut être utilisé pour identifier les voies métaboliques les plus importantes dans le réseau, en sélectionnant les arêtes qui ont le poids le plus faible et donc les réactions les plus efficaces.
+
+-   L'**analyse de données de séquençage**, où le MST est utilisé pour comparer des séquences d'ADN ou d'ARN et identifier les mutations qui les distinguent. En construisant un graphe dont les sommets représentent les séquences et les arêtes représentent les différences entre les séquences, le MST permet de trouver le chemin le plus court qui relie toutes les séquences, ce qui correspond à l'ensemble des mutations qui les séparent.
+
+## Algorithme de Prim 
 
 ### Présentation
 
@@ -42,3 +58,17 @@ L'algorithme de Prim commence par un **sommet arbitraire** et s'étend étape pa
 -   **Greedy Algorithm** : à chaque étape, il fait le choix optimal local dans l'espoir que ce choix conduira à une solution optimale globale.
 
 -   **Indépendant du Sommet de Départ** : peu importe le sommet de départ, l'algorithme trouve toujours le même arbre couvrant minimal. Cela montre la fiabilité de l'algorithme pour fournir un résultat consistant et optimal indépendamment de sommet initial choisi.
+
+## Algorithme de Kruskal 
+
+## Implémentation des algorithmes en R 
+
+## Implémentation des algorithmes en Rcpp 
+
+## Comparaison 
+
+### Comparaison des algorithmes 
+
+### Comparaison des langages 
+
+## Références 
