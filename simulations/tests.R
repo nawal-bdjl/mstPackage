@@ -17,13 +17,13 @@ prim_mst_rcpp(s)
 kruskal_mst_rcpp(s)
 
 
-
 ################################################################################################
 # We define the function one.simu which returns the execution time of a given algorithm
 
-one.simu <- function(n, func = "prim_mst") {
-  adj_matrix <- generate_random_adjacency_matrix(n)
-
+library(mstPackage)
+library(ggplot2)
+library(microbenchmark)
+one.simu <- function(func = "prim_mst", ajd_matrix = NULL) {
   start_time <- NA
   end_time <- NA
 
@@ -51,6 +51,10 @@ one.simu <- function(n, func = "prim_mst") {
   return(unclass(end_time - start_time)[1])
 }
 
+n <- 1000
+adj_matrix <- generate_random_adjacency_matrix(n)
+one.simu(func = "kruskal_mst", ajd_matrix)
+
 
 ################################################################################################
 
@@ -60,10 +64,11 @@ one.simu <- function(n, func = "prim_mst") {
 ###########################################################
 #we evaluate the time with a given n for the 4 algorithms
 n <- 1000
-one.simu(n, func = "prim_mst")
-one.simu(n, func = "kruskal_mst")
-one.simu(n, func = "prim_mst_rcpp")
-one.simu(n, func = "kruskal_mst_rcpp")
+adj_matrix <- generate_random_adjacency_matrix(n)
+one.simu(func = "prim_mst", adj_matrix)
+one.simu(func = "kruskal_mst", adj_matrix)
+one.simu(func = "prim_mst_rcpp",adj_matrix)
+one.simu(func = "kruskal_mst_rcpp",adj_matrix)
 
 
 
@@ -73,14 +78,15 @@ one.simu(n, func = "kruskal_mst_rcpp")
 
 #we compare the running time at a given length n with repeated executions (nbSimus times)
 nbSimus <- 1000
+adj_matrix <- generate_random_adjacency_matrix(n)
 time1 <- 0
 time2 <- 0
 time3 <- 0
 time4 <- 0
-for(i in 1:nbSimus){time1 <- time1 + one.simu(n, func = "prim_mst")}
-for(i in 1:nbSimus){time2 <- time2 + one.simu(n, func = "kruskal_mst")}
-for(i in 1:nbSimus){time3 <- time3 + one.simu(n, func = "prim_mst_rcpp")}
-for(i in 1:nbSimus){time4 <- time4 + one.simu(n, func = "kruskal_mst_rcpp")}
+for(i in 1:nbSimus){time1 <- time1 + one.simu(func = "prim_mst", adj_matrix)}
+for(i in 1:nbSimus){time2 <- time2 + one.simu(func = "kruskal_mst", adj_matrix)}
+for(i in 1:nbSimus){time3 <- time3 + one.simu(func = "prim_mst_rcpp", adj_matrix)}
+for(i in 1:nbSimus){time4 <- time4 + one.simu(func = "kruskal_mst_rcpp", adj_matrix)}
 
 #gain R -> rcpp
 time1/time3
@@ -122,7 +128,8 @@ time1/time4 #à adapter
 ##########################################
 
 n <- 5000
-res <- microbenchmark(one.simu(n, func = "prim_mst_rcpp"), one.simu(n, func = "kruskal_mst_rcpp"), times = 50)
+adj_matrix <- generate_random_adjacency_matrix(n)
+res <- microbenchmark(one.simu(func = "prim_mst_rcpp", ajd_matrix), one.simu(func = "kruskal_mst_rcpp"), times = 50, ajd_matrix)
 autoplot(res)
 res
 
@@ -131,102 +138,54 @@ res
 ############# time complexity ############
 ##########################################
 
+sizes <- c(3, 5)#, 10, 15, 20, 50, 100, 200, 500, 1000)
 
-# Comparaison des deux algorithmes en R
-sizes <- c(5, 7, 10, 15, 20, 50, 100, 200, 500, 1000)
-times_prim <- sapply(sizes, function(n) one.simu(n, "prim_mst"))
-times_kruskal <- sapply(sizes, function(n) one.simu(n, "kruskal_mst"))
+times <- vector("list", length(sizes))
+names(times) <- as.character(sizes)
 
-data <- data.frame(
-  Size = rep(sizes, times = 2),
-  Time = c(times_prim, times_kruskal),
-  Algorithm = rep(c("Prim", "Kruskal"), each = length(sizes))
-)
-data$logSize = log(data$Size)
-data$logTime = log(data$Time)
+# Boucle sur chaque taille pour générer les matrices d'adjacence et mesurer les temps
+for (size in sizes) {
+  adj_matrix <- generate_random_adjacency_matrix(size)
 
-graph = ggplot(data, aes(x = logSize, y = logTime, color = Algorithm)) +
-  geom_point() +
-  geom_line(aes(group = Algorithm)) +
-  labs(title = "Comparaison des performances en R: Prim vs Kruskal",
-       x = "Log(Size)", y = "Log(Time)") +
-  theme_minimal()
+  times[[as.character(size)]] <- c(
+    prim_mst = one.simu("prim_mst", adj_matrix),
+    kruskal_mst = one.simu("kruskal_mst", adj_matrix),
+    prim_mst_rcpp = one.simu("prim_mst_rcpp", adj_matrix),
+    kruskal_mst_rcpp = one.simu("kruskal_mst_rcpp", adj_matrix)
+  )
+}
 
-print(graph)
-summary(lm(logTime ~ logSize + Algorithm, data = data))
+results_list <- lapply(names(times), function(size) {
+  data.frame(Size = rep(as.integer(size), 4),
+             Time = as.numeric(times[[size]]),
+             Algorithm = c("Prim_R", "Kruskal_R", "Prim_Rcpp", "Kruskal_Rcpp"))
+})
 
-
-# Comparaison des deux algorithmes en rcpp
-sizes <- c(5, 7, 10, 15, 20, 50, 100, 200, 500, 1000)
-times_prim <- sapply(sizes, function(n) one.simu(n, "prim_mst_rcpp"))
-times_kruskal <- sapply(sizes, function(n) one.simu(n, "kruskal_mst_rcpp"))
-
-data <- data.frame(
-  Size = rep(sizes, times = 2),
-  Time = c(times_prim, times_kruskal),
-  Algorithm = rep(c("Prim", "Kruskal"), each = length(sizes))
-)
-data$logSize = log(data$Size)
-data$logTime = log(data$Time)
-
-graph2 = ggplot(data, aes(x = logSize, y = logTime, color = Algorithm)) +
-  geom_point() +
-  geom_line(aes(group = Algorithm)) +
-  labs(title = "Comparaison des performances en Rcpp: Prim vs Kruskal",
-       x = "Log(Size)", y = "Log(Time)") +
-  theme_minimal()
-
-print(graph2)
-summary(lm(logTime ~ logSize + Algorithm, data = data))
+results_df <- do.call(rbind, results_list)
+results_df$logSize <- log(results_df$Size)
+results_df$logTime <- log(results_df$Time)
 
 
+# Affichage des résultats
+analyze_and_plot <- function(df, filter, title) {
+  filtered_df <- df[df$Algorithm %in% filter, ]
 
+  ggplot(filtered_df, aes(x = logSize, y = logTime, color = Algorithm)) +
+    geom_point() +
+    geom_line(aes(group = Algorithm)) +
+    labs(title = title, x = "Log(Size)", y = "Log(Time)") +
+    theme_minimal() -> p
+  print(p)
 
-# Comparaison Kruskal R vs rcpp
-sizes <- c(5, 7, 10, 15, 20, 50, 100, 200, 500, 1000)
-times_kruskal <- sapply(sizes, function(n) one.simu(n, "kruskal_mst"))
-times_kruskal_rcpp <- sapply(sizes, function(n) one.simu(n, "kruskal_mst_rcpp"))
+  fit <- lm(logTime ~ logSize + Algorithm, data = filtered_df)
+  print(summary(fit))
 
-data <- data.frame(
-  Size = rep(sizes, times = 2),
-  Time = c(times_kruskal, times_kruskal_rcpp),
-  Algorithm = rep(c("Kruskal_R", "Kruskal_rcpp"), each = length(sizes))
-)
-data$logSize = log(data$Size)
-data$logTime = log(data$Time)
+  # Extraction des pentes
+  slopes <- coef(fit)[grep("logSize", names(coef(fit)))]
+  cat("\nSlopes for", title, ": ", slopes, "\n\n")
+}
 
-graph3 = ggplot(data, aes(x = logSize, y = logTime, color = Algorithm)) +
-  geom_point() +
-  geom_line(aes(group = Algorithm)) +
-  labs(title = "Comparaison des performances de Kruskal: R vs Rcpp",
-       x = "Log(Size)", y = "Log(Time)") +
-  theme_minimal()
-
-print(graph3)
-summary(lm(logTime ~ logSize + Algorithm, data = data))
-
-
-
-# Comparaison Prim R vs Rcpp
-sizes <- c(5, 7, 10, 15, 20, 50, 100, 200, 500, 1000, 5000)
-times_prim <- sapply(sizes, function(n) one.simu(n, "prim_mst"))
-times_prim_rcpp <- sapply(sizes, function(n) one.simu(n, "prim_mst_rcpp"))
-
-data <- data.frame(
-  Size = rep(sizes, times = 2),
-  Time = c(times_prim, times_prim_rcpp),
-  Algorithm = rep(c("Prim_R", "Prim_rcpp"), each = length(sizes))
-)
-data$logSize = log(data$Size)
-data$logTime = log(data$Time)
-
-graph4 = ggplot(data, aes(x = logSize, y = logTime, color = Algorithm)) +
-  geom_point() +
-  geom_line(aes(group = Algorithm)) +
-  labs(title = "Comparaison des performances de Prim: R vs Rcpp",
-       x = "Log(Size)", y = "Log(Time)") +
-  theme_minimal()
-
-print(graph4)
-summary(lm(logTime ~ logSize + Algorithm, data = data))
-
+analyze_and_plot(results_df, c("Prim_R", "Kruskal_R"), "Comparaison des performances en R: Prim vs Kruskal")
+analyze_and_plot(results_df, c("Prim_Rcpp", "Kruskal_Rcpp"), "Comparaison des performances en Rcpp: Prim vs Kruskal")
+analyze_and_plot(results_df, c("Kruskal_R", "Kruskal_Rcpp"), "Comparaison des performances de Kruskal: R vs Rcpp")
+analyze_and_plot(results_df, c("Prim_R", "Prim_Rcpp"), "Comparaison des performances de Prim: R vs Rcpp")
