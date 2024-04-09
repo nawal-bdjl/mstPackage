@@ -9,7 +9,7 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# MST Package 
+# Minimum Spanning Tree Package 
 
 ## Introduction
 
