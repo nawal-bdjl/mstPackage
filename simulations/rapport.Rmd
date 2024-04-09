@@ -1,8 +1,8 @@
 ---
-title: "Mst package"
-author: "Nawal Bendjelloul"
-date: "2024-04-07"
-output: html_document
+title: "Mst package - Rapport"
+author: "Rabab Khatib, Gabriele Pedroni, Nawal Bendjelloul"
+date: "2024-04-11"
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
