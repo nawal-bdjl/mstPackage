@@ -143,7 +143,7 @@ sizes <- c(3, 5)#, 10, 15, 20, 50, 100, 200, 500, 1000)
 times <- vector("list", length(sizes))
 names(times) <- as.character(sizes)
 
-# Boucle sur chaque taille pour générer les matrices d'adjacence et mesurer les temps
+# Time measure 
 for (size in sizes) {
   adj_matrix <- generate_random_adjacency_matrix(size)
 
@@ -166,7 +166,7 @@ results_df$logSize <- log(results_df$Size)
 results_df$logTime <- log(results_df$Time)
 
 
-# Affichage des résultats
+# Plot results 
 analyze_and_plot <- function(df, filter, title) {
   filtered_df <- df[df$Algorithm %in% filter, ]
 
@@ -180,7 +180,6 @@ analyze_and_plot <- function(df, filter, title) {
   fit <- lm(logTime ~ logSize + Algorithm, data = filtered_df)
   print(summary(fit))
 
-  # Extraction des pentes
   slopes <- coef(fit)[grep("logSize", names(coef(fit)))]
   cat("\nSlopes for", title, ": ", slopes, "\n\n")
 }
