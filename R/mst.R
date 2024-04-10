@@ -95,6 +95,12 @@ kruskal_mst <- function(adj_matrix) {
   # Sort edges based on weight
   edges <- do.call(rbind, edges)
   edges <- edges[order(edges[,3]), ]
+
+  # Check if the graph is not connected
+  if (length(edges) < num_vertices - 1) {
+    warning("Warning: Not possible to output a MST, as the given adjacency matrix does not represent a connected graph.")
+    return(NULL)
+  }
   
   # Initialize parent array
   parent <- c(1:num_vertices)
