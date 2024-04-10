@@ -70,13 +70,6 @@ NumericMatrix generate_random_adjacency_matrix(int n, Nullable<int> num_zeros = 
 // [[Rcpp::export]]
 NumericMatrix prim_mst_rcpp(NumericMatrix adj_matrix) {
   int n = adj_matrix.nrow();
-
-  bool is_connected = is_connected_bfs(adj_matrix);
-  if (!is_connected) {
-    Rcpp::warning("Warning: graph is not connected, there is no MST");
-    return NumericMatrix(n, n); // Return an empty matrix if not connected
-  }
-
   // Initialize "parent" array with NA values
   IntegerVector parent(n, NA_INTEGER);
   // Initialize "key" array with +inf
@@ -118,12 +111,6 @@ NumericMatrix prim_mst_rcpp(NumericMatrix adj_matrix) {
 // [[Rcpp::export]]
 NumericMatrix kruskal_mst_rcpp(NumericMatrix adj_matrix) {
   int num_vertices = adj_matrix.nrow();
-
-  bool is_connected = is_connected_bfs(adj_matrix);
-  if (!is_connected) {
-    Rcpp::warning("Warning: graph is not connected, there is no MST");
-    return NumericMatrix(n, n); // Return an empty matrix if not connected
-  }
 
   // Find edges and their weights from the adjacency matrix
   std::vector<std::vector<double>> edges;
