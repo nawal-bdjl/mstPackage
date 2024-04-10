@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = FALSE)
 
 # Introduction
 
-## Contexte - Principe
+## Contexte
 
 Le Minimum Spanning Tree (MST) est un arbre couvrant de poids minimal d'un graphe connexe et pondéré. Il s'agit d'un sous-graphe acyclique qui relie tous les sommets du graphe original en minimisant la somme des poids des arêtes.
 
@@ -31,16 +31,14 @@ Le MST a de nombreuses applications en santé, notamment dans l'analyse de donn�
 
 # Algorithme de Prim
 
-## Présentation
-
 L'**algorithme de Prim**, popularisé par Prim en 1957, est un algorithme de graphes trouvant un **arbre couvrant minimal** pour un graphe connexe pondéré non dirigé.\
 Son objectif est de connecter tous les sommets du graphe avec les arêtes de poids minimal possible, sans former de cycle, pour que le poids total de l'arbre couvrant minimal soit le plus bas possible.
 
-## Le principe
+## Principe
 
 L'algorithme de Prim commence par un **sommet arbitraire** et s'étend étape par étape jusqu'à couvrir tous les sommets du graphe. À chaque étape, il ajoute l'**arête de poids minimal** **disponible** qui connecte un sommet de l'arbre en construction à un sommet en dehors de l'arbre.
 
-## Etape de l'algorithme
+## Etapes de l'algorithme
 
 1.  **Initialisation** : Sélectionner un sommet de départ arbitraire du graphe.
 2.  **Sélection des Arêtes** : À partir du sommet sélectionné, choisir l'arête de poids minimal qui connecte un sommet déjà dans l'arbre à un sommet qui n'est pas encore dans l'arbre.
@@ -55,11 +53,11 @@ L'algorithme de Prim commence par un **sommet arbitraire** et s'étend étape pa
 
 # Algorithme de Kruskal
 
-## L'algorithme
+## Principe
 
 L'algorithme de Kruskal est un algorithme utilisé pour trouver le minimum spanning tree (MST) d'un graphe non orienté et connecté. Le MST d'un graphe est le sous-ensemble d'arêtes qui relie tous les sommets du graphe avec le poids total le moins élevé possible, sans former de cycles.
 
-L'algorithme de Kruskal est greedy, ce qui signifie qu'il fait des choix localement optimaux (ajout de l'arête la moins chère) dans le but d'obtenir un résultat globalement optimal (coût total minimum du MST).
+## Etapes de l'algorithme
 
 Voici les étapes de l'algorithme de Kruskal:
 
@@ -76,8 +74,11 @@ Voici les étapes de l'algorithme de Kruskal:
 
 -   **Arrêtez lorsque tous les sommets sont connectés:** : Continuez à traiter les arêtes jusqu'à ce que vous ayez suffisamment d'arêtes dans l'ensemble MST pour connecter tous les sommets du graphe (vous devriez avoir V-1 arêtes). Une fois que tous les nœuds sont connectés, vous avez trouvé la MST, qui représente le réseau dont le coût total est le plus faible.
 
+## Propriétés
 
-# Code R
+L'algorithme de Kruskal est **greedy**, ce qui signifie qu'il fait des choix localement optimaux (ajout de l'arête la moins chère) dans le but d'obtenir un résultat globalement optimal (coût total minimum du MST).
+
+# Implémentation en R
 
 Dans cette section, nous allons détailler l'implémentation des algorithmes de Prim et de Kruskal pour trouver un arbre couvrant de poids minimum dans un graphe pondéré en R. Nous aborderons également les choix d'implémentation et calculerons la complexité de ces algorithmes.
 
@@ -89,67 +90,67 @@ L'algorithme prend en entrée la **matrice d'adjacence** répresentant le graphe
 
 ### Initialisation des structures de données
 
-  ```r
-  n <- nrow(adj_matrix)
-  parent <- rep(NA, n)   
-  key <- rep(Inf, n)     
-  mst_set <- rep(FALSE, n)  
-  key[1] <- 0
-  ```
+``` r
+n <- nrow(adj_matrix)
+parent <- rep(NA, n)   
+key <- rep(Inf, n)     
+mst_set <- rep(FALSE, n)  
+key[1] <- 0
+```
 
 Les structures de données nécessaires pour l'algorithme de Prim sont :
 
-- Le tableau `parent` pour stocker les parents des sommets dans l'arbre partiel en cours de construction.
+-   Le tableau `parent` pour stocker les parents des sommets dans l'arbre partiel en cours de construction.
 
-- Le tableau `key` pour stocker les clés (poids) associées à chaque sommet. Initialement, toutes les clés sont initialisées à l'infini, sauf pour le premier sommet qui est initialisé à 0. Ainsi, à chaque étape, est sélectionné le sommet avec la clé minimale qui n'est pas encore inclus dans l'arbre couvrant. Cela peut être efficacement réalisé en utilisant une liste de priorité.
+-   Le tableau `key` pour stocker les clés (poids) associées à chaque sommet. Initialement, toutes les clés sont initialisées à l'infini, sauf pour le premier sommet qui est initialisé à 0. Ainsi, à chaque étape, est sélectionné le sommet avec la clé minimale qui n'est pas encore inclus dans l'arbre couvrant. Cela peut être efficacement réalisé en utilisant une liste de priorité.
 
-- Le tableau `mst_set` pour suivre les sommets déjà inclus dans l'arbre couvrant de poids minimum.
+-   Le tableau `mst_set` pour suivre les sommets déjà inclus dans l'arbre couvrant de poids minimum.
 
 ### Boucle principale de l'algorithme
 
-  ```r
-  for (count in 1:(n - 1)) {
-      u <- min_key_vertex(key, mst_set)
-      mst_set[u] <- TRUE  
-  
-      for (v in 1:n) {
-          if (adj_matrix[u, v] != 0 && !mst_set[v] && adj_matrix[u, v] < key[v]) {
-              parent[v] <- u
-              key[v] <- adj_matrix[u, v]
-          }
-      }
-  }
-  ```
+``` r
+for (count in 1:(n - 1)) {
+    u <- min_key_vertex(key, mst_set)
+    mst_set[u] <- TRUE  
+
+    for (v in 1:n) {
+        if (adj_matrix[u, v] != 0 && !mst_set[v] && adj_matrix[u, v] < key[v]) {
+            parent[v] <- u
+            key[v] <- adj_matrix[u, v]
+        }
+    }
+}
+```
 
 La boucle principale parcourt les sommets de 1 à (n - 1), où n est le nombre de sommets du graphe. À chaque étape, l'algorithme selectionne le sommet avec la clé minimale (`u`) qui n'est pas encore inclus dans l'arbre couvrant de poids minimum. Ensuite, si nécessaire, les clés de ses voisins non inclus dans l'arbre sont mises à jour.
 
-  ```r
-  min_key_vertex <- function(key, mst_set) {
-    min_key <- Inf
-    min_index <- -1
-    
-    for (v in 1:length(key)) {
-      if (!mst_set[v] && key[v] < min_key) {
-        min_key <- key[v]
-        min_index <- v
-      }
+``` r
+min_key_vertex <- function(key, mst_set) {
+  min_key <- Inf
+  min_index <- -1
+  
+  for (v in 1:length(key)) {
+    if (!mst_set[v] && key[v] < min_key) {
+      min_key <- key[v]
+      min_index <- v
     }
-    
-    return(min_index)
   }
-  ```
+  
+  return(min_index)
+}
+```
 
 La fonction auxiliaire `min_key_vertex` permet de sélectionner le sommet avec la clé minimale et sa définition externe garantit une exécution plus efficace de cette opération.
 
 ### Construction de la matrice d'adjacence du MST
 
-  ```r
-  mst <- matrix(0, nrow = n, ncol = n)
-  for (v in 2:n) {
-      mst[parent[v], v] <- adj_matrix[parent[v], v]
-      mst[v, parent[v]] <- adj_matrix[parent[v], v]
-  }
-  ```
+``` r
+mst <- matrix(0, nrow = n, ncol = n)
+for (v in 2:n) {
+    mst[parent[v], v] <- adj_matrix[parent[v], v]
+    mst[v, parent[v]] <- adj_matrix[parent[v], v]
+}
+```
 
 Une fois que tous les sommets sont inclus dans l'arbre couvrant de poids minimum, la matrice d'adjacence de cet arbre est construite en utilisant les informations stockées dans le tableau `parent`.
 
@@ -157,111 +158,108 @@ Une fois que tous les sommets sont inclus dans l'arbre couvrant de poids minimum
 
 Soit V le nombre de sommets.
 
-- L'**initialisation** nécessite O(V) opérations.
-- La **boucle principale** s'exécute pour chaque sommet, sélectionnant à chaque itération le sommet avec la clé minimale. Dans le pire cas, cela prend O(V) itérations. La boucle appelle également la fonction `min_key_vertex`, de complexité O(V), pour une complexité totale de O($V^2$).
-- La construction de la **matrice d'adjacence** prend O($V^2$) opérations.
+-   L'**initialisation** nécessite O(V) opérations.
+-   La **boucle principale** s'exécute pour chaque sommet, sélectionnant à chaque itération le sommet avec la clé minimale. Dans le pire cas, cela prend O(V) itérations. La boucle appelle également la fonction `min_key_vertex`, de complexité O(V), pour une complexité totale de O($V^2$).
+-   La construction de la **matrice d'adjacence** prend O($V^2$) opérations.
 
-La complexité totale de l'algorithme de Prim est donc généralement de l'ordre de **O($V^2$)**.
+La complexité totale de l'algorithme de Prim est donc généralement de l'ordre de **O(**$V^2$).
 
 ## Algorithme de Kruskal
 
-L'algorithme de Kruskal fonctionne en sélectionnant les arêtes par poids croissant et en vérifiant à chaque fois si l'ajout de l'arête ne crée pas de cycle. 
+L'algorithme de Kruskal fonctionne en sélectionnant les arêtes par poids croissant et en vérifiant à chaque fois si l'ajout de l'arête ne crée pas de cycle.
 
 L'algorithme prend en entrée la **matrice d'adjacence** pour construire la liste des arêtes ordonnées par poids.
 
 ### Recherche et tri des arêtes
 
-  ```r
-    num_vertices <- nrow(adj_matrix)
-    
-    # Find edges and their weights from the adjacency matrix
-    edges <- list()
-    for (i in 1:num_vertices) {
-      for (j in 1:num_vertices) {
-        if (adj_matrix[i, j] != 0 && i < j) {
-          edges <- c(edges, list(c(i, j, adj_matrix[i, j])))
-        }
+``` r
+  num_vertices <- nrow(adj_matrix)
+  
+  # Find edges and their weights from the adjacency matrix
+  edges <- list()
+  for (i in 1:num_vertices) {
+    for (j in 1:num_vertices) {
+      if (adj_matrix[i, j] != 0 && i < j) {
+        edges <- c(edges, list(c(i, j, adj_matrix[i, j])))
       }
     }
-    
-    # Sort edges based on weight
-    edges <- do.call(rbind, edges)
-    edges <- edges[order(edges[,3]), ]
-  ``` 
+  }
+  
+  # Sort edges based on weight
+  edges <- do.call(rbind, edges)
+  edges <- edges[order(edges[,3]), ]
+```
 
 A partir de la matrice d'adjacence, on construit la liste `edges`, en incluant uniquement les arêtes avec des poids non nuls. Les arêtes sont stockées dans une liste pour faciliter leur manipulation et leur tri. Ensuite, elles sont triées par poids croissant pour garantir que l'algorithme sélectionne toujours celle de poids minimum disponible à chaque étape.
 
 ### Structure Union-Find
 
-  ```r
-    # Initialize parent array
-    parent <- c(1:num_vertices)
-    
-    # Function to find the root of a node
-    find_root <- function(node) {
-      while (parent[node] != node) {
-        node <- parent[node]
-      }
-      return(node)
+``` r
+  # Initialize parent array
+  parent <- c(1:num_vertices)
+  
+  # Function to find the root of a node
+  find_root <- function(node) {
+    while (parent[node] != node) {
+      node <- parent[node]
     }
-    
-    # Function to perform union of two sets
-    union_sets <- function(x, y) {
-      root_x <- find_root(x)
-      root_y <- find_root(y)
-      parent[root_x] <<- root_y
-    }
-  ``` 
+    return(node)
+  }
+  
+  # Function to perform union of two sets
+  union_sets <- function(x, y) {
+    root_x <- find_root(x)
+    root_y <- find_root(y)
+    parent[root_x] <<- root_y
+  }
+```
 
-Une structure de données Union-Find est initialisée pour maintenir les ensembles de sommets connectés et pour éviter la formation de cycles lors de la construction du MST. Cette structure permet de gérer les ensembles de sommets connectés et de fusionner deux ensembles de manière efficace. 
+Une structure de données Union-Find est initialisée pour maintenir les ensembles de sommets connectés et pour éviter la formation de cycles lors de la construction du MST. Cette structure permet de gérer les ensembles de sommets connectés et de fusionner deux ensembles de manière efficace.
 
-En pratique, cette structure est implémentée en utilisant la technique de l'union par rang avec compression de chemin. Avec elles sont définies deux fonctions auxiliaires :
-   - `find_root`, pour trouver la racine d'un ensemble dans la structure.
-   - `union_sets`, pour fusionner deux ensembles dans la structure.
+En pratique, cette structure est implémentée en utilisant la technique de l'union par rang avec compression de chemin. Avec elles sont définies deux fonctions auxiliaires : - `find_root`, pour trouver la racine d'un ensemble dans la structure. - `union_sets`, pour fusionner deux ensembles dans la structure.
 
 ### Boucle principale de l'algorithme
 
-  ```r
-    for (i in 1:(num_vertices - 1)) {
-      while (TRUE) {
-        edge <- edges[1, ]
-        edges <- edges[-1, ]
-        u <- edge[1]
-        v <- edge[2]
-        if (find_root(u) != find_root(v)) {
-          mst_edges[u, v] <- edge[3]
-          mst_edges[v, u] <- edge[3]
-          mst_weight <- mst_weight + edge[3]
-          union_sets(u, v)
-          break
-        }
+``` r
+  for (i in 1:(num_vertices - 1)) {
+    while (TRUE) {
+      edge <- edges[1, ]
+      edges <- edges[-1, ]
+      u <- edge[1]
+      v <- edge[2]
+      if (find_root(u) != find_root(v)) {
+        mst_edges[u, v] <- edge[3]
+        mst_edges[v, u] <- edge[3]
+        mst_weight <- mst_weight + edge[3]
+        union_sets(u, v)
+        break
       }
     }
-  ```
-  
+  }
+```
+
 La boucle principale de l'algorithme itère sur toutes les arêtes triées par poids. À chaque itération, l'algorithme vérifie si l'ajout de l'arête au MST entraînerait la formation d'un cycle en recherchant les racines des ensembles des sommets connectés par l'arête. Si ce n'est pas le cas, l'arête est ajoutée à l'arbre et les ensembles de sommets sont fusionnés.
 
 L'algorithme s'arrête lorsque le MST contient `num_vertices - 1` arêtes, ce qui est suffisant pour connecter tous les sommets.
-     
+
 ### Calcul de la complexité théorique
 
 Soit E le nombre d'arêtes et V le nombre de sommets.
 
-- La conversion de la matrice d'adjacence en **liste d'arêtes** a une complexité de O($V^2$). 
-- Le **tri des arêtes** par poids croissant prend généralement O(E log E) opérations. Dans le pire des cas, un graphe complet a E = V(V-1)/2 arêtes, cette opération a une complexité de O($V^2 log V$).
-- La **boucle principale** itère sur chaque arête triée (O(E)) et effectue une opération Union-Find (O(log V)) pour vérifier et ajouter l'arête si elle ne crée pas de cycle. Dans le pire cas, cela prend O(E log V) opérations.
-- La construction du MST prend O(E) opérations et sa conversion en **matrice d'adjacence** O(V) opérations.
+-   La conversion de la matrice d'adjacence en **liste d'arêtes** a une complexité de O($V^2$).
+-   Le **tri des arêtes** par poids croissant prend généralement O(E log E) opérations. Dans le pire des cas, un graphe complet a E = V(V-1)/2 arêtes, cette opération a une complexité de O($V^2 log V$).
+-   La **boucle principale** itère sur chaque arête triée (O(E)) et effectue une opération Union-Find (O(log V)) pour vérifier et ajouter l'arête si elle ne crée pas de cycle. Dans le pire cas, cela prend O(E log V) opérations.
+-   La construction du MST prend O(E) opérations et sa conversion en **matrice d'adjacence** O(V) opérations.
 
-La complexité totale de l'algorithme de Kruskal est alors de O($V^2 + V^2 log V + E log V + E + V$), avec E qui peut être au maximum $V^2$. Donc, la complexité totale est de l'ordre de **O($V^2$ log V)**.
+La complexité totale de l'algorithme de Kruskal est alors de O($V^2 + V^2 log V + E log V + E + V$), avec E qui peut être au maximum $V^2$. Donc, la complexité totale est de l'ordre de **O(**$V^2$ log V).
 
-
-# Code C++
+# Implémentation en C++
 
 Dans cette section, nous allons détailler l'implémentation des algorithmes de Prim et de Kruskal pour trouver un arbre couvrant de poids minimum dans un graphe pondéré en C++. Nous aborderons également les choix d'implémentation et calculerons la complexité de ces algorithmes.
 
 ## Algorithme de Prim
 
-### Initializing Data Structures
+### Initialisation des structures de données
 
 ```         
 int n = adj_matrix.nrow();
@@ -397,15 +395,13 @@ En considérant les complexités de toutes les étapes :
 
 Si la complexité globale est dominée par l'étape de tri, la complexité est de $O(E log E)$ ; sinon, la complexité est de $O(V^2)$.
 
-# Implémentation des algorithmes en R
-
-# Implémentation des algorithmes en Rcpp
-
 # Simulation de données
 
-## Simulation de données pour n petit
+Dans cette section, nous allons discuter de la **simulation de données** pour tester notre package Rcpp.
 
-Dans cette section, nous allons discuter de la **simulation de données** pour tester notre package Rcpp. Nous avons commencé par simuler des données pour un **petit graphe** avec seulement 5 sommets (n=5).
+## Cas n petit
+
+Nous avons commencé par simuler des données pour un **petit graphe** avec seulement 5 sommets (n=5).
 
 ```{r, echo = FALSE}
 library(igraph)
@@ -444,7 +440,7 @@ plot_graph(kc, "Kruskal MST (Rcpp)")
 
 Nous pouvons alors visualiser le graphe initial, et les arbres couvrant minimum (ACM) obtenus pour les 4 algorithmes : comme nous pouvons le voir, nous obtenons les mêmes ACM pour les 4 algorithmes.
 
-## simulation pour n grand
+## Cas n grand
 
 Ici, nous allons réaliser notre simulation sur un plus grand nombre de sommets, à 100.
 
@@ -485,7 +481,7 @@ Nous pouvons tenter de visualiser les graphes obtenus, mais ceux-ci s'avèrement
 
 Nous allons, dans cette partie, comparer les **complexités temporelles** des *algorithmes de Prim* et *Kruskal*, dans les deux langages. L'intérêt de comparer la complexité temporelle est de déterminer **l'efficacité de notre package**, mais aussi des algorithmes de Prim et Kruskal, en particulier pour des graphes de grande taille.
 
-Pour cela, nous implémentons une fonction \verb\|one.simu\| qui va mesurer le temps d'exécution des algorithmes. Nous pouvons alors commencer par étudier le temps d'exécution dans le meilleur et pire des cas.
+Pour cela, nous implémentons une fonction \\verb\|one.simu\| qui va mesurer le temps d'exécution des algorithmes. Nous pouvons alors commencer par étudier le temps d'exécution dans le meilleur et pire des cas.
 
 ```{r, echo=FALSE}
 library(mstPackage)
@@ -751,7 +747,7 @@ df_results9 <- data.frame(
 print(df_results9)
 ```
 
-Les résultats montrent que les vitesses d'exécution de Prim et Kruskal en Rcpp sont très proches, avec Kruskal devant. Côté R, Prim dépasse largement Kruskal.  
+Les résultats montrent que les vitesses d'exécution de Prim et Kruskal en Rcpp sont très proches, avec Kruskal devant. Côté R, Prim dépasse largement Kruskal.
 
 ### Graphe dense
 
@@ -777,14 +773,14 @@ df_results_dense <- data.frame(
 
 print(df_results_dense)
 ```
-Comme attendu, la vitesse d'exécution a augmenté par rapport aux résultats précédents, pour tous les algorithmes. Pour autant, Kruskal en Rcpp est toujours devant, tandis que Kruskal R est le dernier; 
 
-Les différentes études de cas montrent que la **vitesse d'exécution** des algorithmes **varie selon le type de graphe**, mais que nous avons toujours comme algorithme le **plus rapide Kruskal en Rcpp**, et **le plus lent, Kruskal en R**. 
+Comme attendu, la vitesse d'exécution a augmenté par rapport aux résultats précédents, pour tous les algorithmes. Pour autant, Kruskal en Rcpp est toujours devant, tandis que Kruskal R est le dernier;
 
+Les différentes études de cas montrent que la **vitesse d'exécution** des algorithmes **varie selon le type de graphe**, mais que nous avons toujours comme algorithme le **plus rapide Kruskal en Rcpp**, et **le plus lent, Kruskal en R**.
 
 ## Analyse diverses tailles de graphe à densité fixée
 
-Nous pouvons maintenant analyser la complexité temporelle des différents algorithmes pour différentes tailles de graphe, avec la densité fixée. 
+Nous pouvons maintenant analyser la complexité temporelle des différents algorithmes pour différentes tailles de graphe, avec la densité fixée.
 
 ```{r, echo = FALSE}
 library(tidyr) 
@@ -823,9 +819,9 @@ size_long$LogTime <- log(size_long$Time)
 
 ```
 
-Comme nous pouvons le voir, tous les algorithmes voient leur vitesse d'exécution augmenter avec la taille du graphe. Cette augmentation est d'autant plus flagrante pour **Kruskal R**, qui a une vitesse d'exécution bien au dessus des autres. L'algorithme le plus rapide est **Prim en Rcpp**. 
+Comme nous pouvons le voir, tous les algorithmes voient leur vitesse d'exécution augmenter avec la taille du graphe. Cette augmentation est d'autant plus flagrante pour **Kruskal R**, qui a une vitesse d'exécution bien au dessus des autres. L'algorithme le plus rapide est **Prim en Rcpp**.
 
-Nous pouvons ensuite récupérer la valeur des pentes des courbes, qui indiquent la relation entre la taille du graphe et le temps d'exécution : 
+Nous pouvons ensuite récupérer la valeur des pentes des courbes, qui indiquent la relation entre la taille du graphe et le temps d'exécution :
 
 ```{r, echo = FALSE}
 
@@ -841,17 +837,16 @@ print(slopes_df)
 
 ```
 
-- **prim_mst (1.16)**: légèrement plus que linéaire donc assez efficace, mais moins pour de très grands graphes.
-- **kruskal_mst (2.41)**: augmentation rapide du temps d'exécution,  moins performant pour les grands graphes.
-- **prim_mst_rcpp (0.67)**: augmentation sous-linéaire, très efficace, surtout pour les grands graphes.
-- **kruskal_mst_rcpp (1.51)**: amélioration par rapport à sa version R, mais toujours avec une augmentation plus que proportionnelle du temps.
+-   **prim_mst (1.16)**: légèrement plus que linéaire donc assez efficace, mais moins pour de très grands graphes.
+-   **kruskal_mst (2.41)**: augmentation rapide du temps d'exécution, moins performant pour les grands graphes.
+-   **prim_mst_rcpp (0.67)**: augmentation sous-linéaire, très efficace, surtout pour les grands graphes.
+-   **kruskal_mst_rcpp (1.51)**: amélioration par rapport à sa version R, mais toujours avec une augmentation plus que proportionnelle du temps.
 
 Les versions **Rcpp sont plus performantes**, avec **Prim Rcpp étant le meilleur choix** pour l'efficacité sur de grands graphes.
 
+## Analyse diverses poids de graphe à densité et taille fixées
 
-#### Analyse diverses poids de graphe à densité et taille fixées
-
-Nous pouvons ensuite analyser les **graphes avec des poids divers à densité et taille fixées**, afin  d'évaluer l'impact de la variation des poids sur les performances des algorithmes. 
+Nous pouvons ensuite analyser les **graphes avec des poids divers à densité et taille fixées**, afin d'évaluer l'impact de la variation des poids sur les performances des algorithmes.
 
 ```{r, echo = FALSE}
 library(tidyr) 
@@ -892,12 +887,13 @@ ggplot(weight_data, aes(x = WeightRange, y = LogTime, group = Algorithm, color =
   scale_x_discrete(name = "Weight Range") +
   ggtitle("Impact des Plages de Poids sur le Temps d'Exécution (Log Scale)")
 ```
-Ici, nous pouvons voir que la **valeur des poids des arêtes** ne semblent **pas** vraiment **impacter** les temps d'exécution : même si il existe quelques variations, cela reste minime et négligeable. 
 
+Ici, nous pouvons voir que la **valeur des poids des arêtes** ne semblent **pas** vraiment **impacter** les temps d'exécution : même si il existe quelques variations, cela reste minime et négligeable.
 
 ## Calcul des gains
 
-Nous pouvons ici calculer le temps d'exécution moyen pour un nombre de simulation répété choisi, mais aussi calculer le rapport entre les différentes vitesses d'exécution. Nous obtenons le dataframe suivant pour les moyennes de temps d'exécution : 
+Nous pouvons ici calculer le temps d'exécution moyen pour un nombre de simulation répété choisi, mais aussi calculer le rapport entre les différentes vitesses d'exécution. Nous obtenons le dataframe suivant pour les moyennes de temps d'exécution :
+
 ```{r, echo = FALSE}
 set.seed(42)
 nbSimus <- 50
@@ -924,9 +920,10 @@ df_results10 <- data.frame(
 
 print(df_results10)
 ```
-Comme on peut le voir, les **algorithmes les plus performants sont ceux implémentés avec Rcpp** : toutefois, L'algorithme **Prim** s'avère fournir de meilleurs résultats, en R et en Rcpp. 
 
-On peut ensuite calculer les **gains en performance** : 
+Comme on peut le voir, les **algorithmes les plus performants sont ceux implémentés avec Rcpp** : toutefois, L'algorithme **Prim** s'avère fournir de meilleurs résultats, en R et en Rcpp.
+
+On peut ensuite calculer les **gains en performance** :
 
 ```{r, echo = FALSE}
 gain_R_to_Rcpp_prim <- time1 / time3
@@ -942,21 +939,22 @@ df_performance_gain <- data.frame(
 
 print(df_performance_gain)
 ```
-On peut voir que : 
 
-- **R to Rcpp (Prim)**: La version Rcpp de Prim est environ **19 fois plus rapide** que sa version en R. 
+On peut voir que :
 
-- **R to Rcpp (Kruskal)**: La version Rcpp de Kruskal est **plus de 134 fois plus rapide** que sa version en R. 
+-   **R to Rcpp (Prim)**: La version Rcpp de Prim est environ **19 fois plus rapide** que sa version en R.
 
-- **Prim to Kruskal (R)**: L'algorithme de Prim en R est environ **90 fois plus rapide** que Kruskal en R.
+-   **R to Rcpp (Kruskal)**: La version Rcpp de Kruskal est **plus de 134 fois plus rapide** que sa version en R.
 
-- **Prim to Kruskal (Rcpp)**: Prim Rcpp est environ **12 fois plus rapide que Kruskal**. 
+-   **Prim to Kruskal (R)**: L'algorithme de Prim en R est environ **90 fois plus rapide** que Kruskal en R.
+
+-   **Prim to Kruskal (Rcpp)**: Prim Rcpp est environ **12 fois plus rapide que Kruskal**.
 
 Cela montre l'impact de l'optimisation de **Rcpp** sur les performances, et confirme aussi la meilleure performance générale de l'**algorithme de Prim sur celui de Kruskal**, tant dans les implémentations R que Rcpp.
 
-
 ## Microbenchmark
-`microbenchmark` est une fonction R qui permet de mesurer le temps d'exécution des différentes fonctions de manière précise. Cela va permettre de comparer les performances de différents algorithmes. 
+
+`microbenchmark` est une fonction R qui permet de mesurer le temps d'exécution des différentes fonctions de manière précise. Cela va permettre de comparer les performances de différents algorithmes.
 
 ```{r, echo = FALSE}
 library(microbenchmark)
@@ -967,14 +965,13 @@ res3 <- microbenchmark(one.simu(func = "prim_mst_rcpp", adj_matrix), one.simu(fu
 autoplot(res3)
 res3
 ```
-Les résultats obtenus confirment bien ce que nous avons pu voir précédemment : les algorithmes en **Rcpp** surpassent largement ceux en R, et de manière générale, **Prim** est plus rapide que Kruskal. 
 
+Les résultats obtenus confirment bien ce que nous avons pu voir précédemment : les algorithmes en **Rcpp** surpassent largement ceux en R, et de manière générale, **Prim** est plus rapide que Kruskal.
 
 ## Références
 
-- Prim R. C., "Shortest connection networks and some generalizations." The Bell System Technical Journal, vol. 36, no. 6, pp. 1389-1401, Nov. 1957, doi: 10.1002/j.1538-7305.1957.tb01515.x.
+-   Prim R. C., "Shortest connection networks and some generalizations." The Bell System Technical Journal, vol. 36, no. 6, pp. 1389-1401, Nov. 1957, doi: 10.1002/j.1538-7305.1957.tb01515.x.
 
-- Kruskal Joseph B., “On the Shortest Spanning Subtree of a Graph and the Traveling Salesman Problem.” Proceedings of the American Mathematical Society 7, no. 1 (1956): 48–50. https://doi.org/10.2307/2033241.
+-   Kruskal Joseph B., “On the Shortest Spanning Subtree of a Graph and the Traveling Salesman Problem.” Proceedings of the American Mathematical Society 7, no. 1 (1956): 48–50. <https://doi.org/10.2307/2033241>.
 
-- Package igraph documentation, https://cran.r-project.org/web/packages/igraph/igraph.pdf
-
+-   Package igraph documentation, <https://cran.r-project.org/web/packages/igraph/igraph.pdf>
