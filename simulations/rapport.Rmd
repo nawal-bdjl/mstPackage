@@ -707,7 +707,7 @@ print(df_results7)
 
 ### Graphes avec Boucles
 
-```{r, fecho = FALSE}
+```{r, echo = FALSE}
 graph_with_loops <- matrix(sample(1:10, 25, replace = TRUE), nrow=5)
 graph_with_loops <- (graph_with_loops + t(graph_with_loops)) / 2
 
