@@ -81,66 +81,60 @@ min_key_vertex <- function(key, mst_set) {
 #' @export
 kruskal_mst <- function(adj_matrix) {
   num_vertices <- nrow(adj_matrix)
-  edges <- adj_matrix_to_edges(adj_matrix)
   
-  # Sorting edges by increasing weight
-  edges <- edges[order(edges[, 3]), ]
-  
-  # Initialization of the Union-Find data structure
-  parent <- 1:num_vertices  # Chaque nœud est son propre parent au début
-  rank <- rep(0, num_vertices)  # Rang initial de chaque arbre
-  
-  # Find function with path compression
-  find_root <- function(node) {
-    if (node != parent[node]) {
-      parent[node] <- find_root(parent[node])
-    }
-    return(parent[node])
-  }
-  
-  # Union by rank function
-  union_sets <- function(x, y) {
-    root_x <- find_root(x)
-    root_y <- find_root(y)
-    if (root_x != root_y) {
-      if (rank[root_x] < rank[root_y]) {
-        parent[root_x] <- root_y
-      } else if (rank[root_x] > rank[root_y]) {
-        parent[root_y] <- root_x
-      } else {
-        parent[root_y] <- root_x
-        rank[root_x] <- rank[root_x] + 1
+  # Find edges and their weights from the adjacency matrix
+  edges <- list()
+  for (i in 1:num_vertices) {
+    for (j in 1:num_vertices) {
+      if (adj_matrix[i, j] != 0 && i < j) {
+        edges <- c(edges, list(c(i, j, adj_matrix[i, j])))
       }
     }
   }
   
-  mst_edges <- matrix(0, nrow = num_vertices-1, ncol = 3)
-  edge_count <- 1
+  # Sort edges based on weight
+  edges <- do.call(rbind, edges)
+  edges <- edges[order(edges[,3]), ]
   
-  for (edge in 1:nrow(edges)) {
-    if (edge_count > num_vertices - 1) break
-    
-    u <- edges[edge, 1]
-    v <- edges[edge, 2]
-    w <- edges[edge, 3]
-    if (find_root(u) != find_root(v)) {
-      mst_edges[edge_count, ] <- c(u, v, w)
-      edge_count <- edge_count + 1
-      union_sets(u, v)
+  # Initialize parent array
+  parent <- c(1:num_vertices)
+  
+  # Function to find the root of a node
+  find_root <- function(node) {
+    while (parent[node] != node) {
+      node <- parent[node]
+    }
+    return(node)
+  }
+  
+  # Function to perform union of two sets
+  union_sets <- function(x, y) {
+    root_x <- find_root(x)
+    root_y <- find_root(y)
+    parent[root_x] <<- root_y
+  }
+  
+  mst_edges <- matrix(0, nrow = num_vertices, ncol = num_vertices)
+  mst_weight <- 0
+  
+  # Kruskal's Algorithm
+  for (i in 1:(num_vertices - 1)) {
+    while (TRUE) {
+      edge <- edges[1, ]
+      edges <- edges[-1, ]
+      u <- edge[1]
+      v <- edge[2]
+      if (find_root(u) != find_root(v)) {
+        mst_edges[u, v] <- edge[3]
+        mst_edges[v, u] <- edge[3]
+        mst_weight <- mst_weight + edge[3]
+        union_sets(u, v)
+        break
+      }
     }
   }
   
-  # Convert MST edges to adjacency matrix
-  mst_adj_matrix <- matrix(0, nrow = num_vertices, ncol = num_vertices)
-  for (edge in 1:nrow(mst_edges)) {
-    i <- mst_edges[edge, 1]
-    j <- mst_edges[edge, 2]
-    w <- mst_edges[edge, 3]
-    mst_adj_matrix[i, j] <- w
-    mst_adj_matrix[j, i] <- w
-  }
-  
-  return(mst_adj_matrix)
+  return(mst_edges)
 }
 
 #' Convert an adjacency matrix into a matrix of edges (source, destination, weight)
