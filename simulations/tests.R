@@ -96,32 +96,6 @@ time2/time4
 time1/time2
 time3/time4
 
-#max gain
-time1/time4 #à adapter
-
-
-####### MY RESULT #######
-#> #gain R -> rcpp
-#  > time1/time3
-#
-#> time2/time4
-#
-#>
-#  > #gain prim -> kruskal
-#  > time1/time2
-#
-#> time3/time4
-#
-#>
-#  > #max gain
-#  > time1/time4
-#
-
-
-#HERE : R to rcpp => at least 150 times faster #à changer aussi
-#HERE : insertion to heap => 10 times faster
-
-
 
 ##########################################
 ############# microbenchmark #############
@@ -143,7 +117,7 @@ sizes <- c(3, 5, 10, 15, 20, 50, 100, 200)#, 500, 1000)
 times <- vector("list", length(sizes))
 names(times) <- as.character(sizes)
 
-# Time measure 
+# Time measure
 for (size in sizes) {
   adj_matrix <- generate_random_adjacency_matrix(size)
 
@@ -166,7 +140,7 @@ results_df$logSize <- log(results_df$Size)
 results_df$logTime <- log(results_df$Time)
 
 
-# Plot results 
+# Plot results
 analyze_and_plot <- function(df, filter, title) {
   filtered_df <- df[df$Algorithm %in% filter, ]
 
