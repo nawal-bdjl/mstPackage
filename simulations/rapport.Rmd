@@ -972,4 +972,9 @@ Les résultats obtenus confirment bien ce que nous avons pu voir précédemment 
 
 ## Références
 
+- Prim R. C., "Shortest connection networks and some generalizations." The Bell System Technical Journal, vol. 36, no. 6, pp. 1389-1401, Nov. 1957, doi: 10.1002/j.1538-7305.1957.tb01515.x.
+
+- Kruskal Joseph B., “On the Shortest Spanning Subtree of a Graph and the Traveling Salesman Problem.” Proceedings of the American Mathematical Society 7, no. 1 (1956): 48–50. https://doi.org/10.2307/2033241.
+
+- Package igraph documentation, https://cran.r-project.org/web/packages/igraph/igraph.pdf
 
