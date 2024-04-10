@@ -600,37 +600,9 @@ Ainsi, on peut voir ici qu'à nouveau, l'algorithme le plus lent est celui de Kr
 
 ## Analyse de différents cas particuliers
 
-### Graphe disjoint
-
-Ici, nous allons analyser différents cas particuliers de graphes et leur impact sur les performances de nos fonctions. Le **graphe disjoint** est un cas particulier car il est composé de plusieurs composantes connexes séparées, et donc de plusieurs sous-graphes.
-
-Une application possible d'un ACM sur un graphe disjoint est la planification de réseaux de communication pour des entreprises ayant plusieurs bureaux situés dans différentes villes. Dans ce cas, chaque composante connexe représente un sous-réseau de bureaux connectés les uns aux autres, et l'ACM peut être utilisé pour déterminer le chemin le plus court pour connecter tous les sous-réseaux ensemble, ce qui permet de minimiser les coûts de construction et de maintenance du réseau.
-
-```{r, echo = FALSE}
-#disjoint_graph <- matrix(Inf, nrow=6, ncol=6)
-#disjoint_graph[1:3, 1:3] <- 1 
-#diag(disjoint_graph) <- Inf 
-
-#results <- c(
-  #d = one.simu(func = "prim_mst", disjoint_graph),
-  #a = one.simu(func = "kruskal_mst", disjoint_graph),
-  #b = one.simu(func = "prim_mst_rcpp", disjoint_graph),
-  #c = one.simu(func = "kruskal_mst_rcpp", disjoint_graph)
-#)
-
-#df_results3 <- data.frame(
-  #Algorithm = c("Prim MST", "Kruskal MST", "Prim MST (Rcpp)", "Kruskal MST (Rcpp)"),
-  #ExecutionTime = unname(results) 
-#)
-#print(df_results3)
-```
-**METTRE WARNING**
-
-Comme expliqué dans la présentation des algorithmes, l'ACM n'est pas initialement fait pour les graphes non connexes : c'est pour cela que les algorithmes ne s'appliquent pas.
-
 ### Graphe cycle complet
 
-Un **graphe cycle complet** est un cas particulier de graphe où tous les sommets sont connectés les uns aux autres en formant un cycle.
+Ici, nous allons analyser différents cas particuliers de graphes et leur impact sur les performances de nos fonctions. Un **graphe cycle complet** est un cas particulier de graphe où tous les sommets sont connectés les uns aux autres en formant un cycle.
 
 Appliquer l'ACM sur un graphe cycle complet permet de faire une **analyse de réseaux métaboliques**, où les sommets représentent des métabolites et les arêtes représentent des réactions chimiques entre eux. Dans ce cas, le graphe cycle complet peut représenter un cycle métabolique complet, comme le cycle de Krebs, et l'ACM peut être utilisé pour identifier les voies métaboliques les plus efficaces pour la production de certains métabolites. Cela peut aider les chercheurs à comprendre comment les organismes régulent leur métabolisme et à développer de nouvelles stratégies pour améliorer la production de métabolites d'intérêt.
 
@@ -819,7 +791,7 @@ library(tidyr)
 library(ggplot2)
 library(mstPackage) 
 
-sizes <- seq(5, 100, by = 10) 
+sizes <- seq(5, 500, by = 10) 
 density <- 0.5 
 
 size_results <- matrix(NA, length(sizes), 4)
