@@ -51,9 +51,9 @@ one.simu <- function(func = "prim_mst", ajd_matrix = NULL) {
   return(unclass(end_time - start_time)[1])
 }
 
-n <- 1000
-adj_matrix <- generate_random_adjacency_matrix(n)
-one.simu(func = "kruskal_mst", ajd_matrix)
+# n <- 1000
+# adj_matrix <- generate_random_adjacency_matrix(n)
+# one.simu(func = "kruskal_mst", ajd_matrix)
 
 
 ################################################################################################
@@ -62,13 +62,13 @@ one.simu(func = "kruskal_mst", ajd_matrix)
 ###########################################################
 ############# One time complexity test ####################
 ###########################################################
-#we evaluate the time with a given n for the 4 algorithms
-n <- 1000
-adj_matrix <- generate_random_adjacency_matrix(n)
-one.simu(func = "prim_mst", adj_matrix)
-one.simu(func = "kruskal_mst", adj_matrix)
-one.simu(func = "prim_mst_rcpp",adj_matrix)
-one.simu(func = "kruskal_mst_rcpp",adj_matrix)
+# #we evaluate the time with a given n for the 4 algorithms
+# n <- 1000
+# adj_matrix <- generate_random_adjacency_matrix(n)
+# one.simu(func = "prim_mst", adj_matrix)
+# one.simu(func = "kruskal_mst", adj_matrix)
+# one.simu(func = "prim_mst_rcpp",adj_matrix)
+# one.simu(func = "kruskal_mst_rcpp",adj_matrix)
 
 
 
@@ -127,18 +127,18 @@ time1/time4 #à adapter
 ############# microbenchmark #############
 ##########################################
 
-n <- 5000
-adj_matrix <- generate_random_adjacency_matrix(n)
-res <- microbenchmark(one.simu(func = "prim_mst_rcpp", ajd_matrix), one.simu(func = "kruskal_mst_rcpp"), times = 50, ajd_matrix)
-autoplot(res)
-res
+# n <- 5000
+# adj_matrix <- generate_random_adjacency_matrix(n)
+# res <- microbenchmark(one.simu(func = "prim_mst_rcpp", ajd_matrix), one.simu(func = "kruskal_mst_rcpp"), times = 50, ajd_matrix)
+# autoplot(res)
+# res
 
 
 ##########################################
 ############# time complexity ############
 ##########################################
 
-sizes <- c(3, 5)#, 10, 15, 20, 50, 100, 200, 500, 1000)
+sizes <- c(3, 5, 10, 15, 20, 50, 100, 200)#, 500, 1000)
 
 times <- vector("list", length(sizes))
 names(times) <- as.character(sizes)
