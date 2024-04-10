@@ -44,7 +44,7 @@ one.simu <- function(func = "prim_mst", ajd_matrix = NULL) {
   }
   else if (func == "prim_mst_rcpp") {
     start_time <- Sys.time()
-    mst <- kruskal_mst_rcpp(adj_matrix)
+    mst <- prim_mst_rcpp(adj_matrix)
     end_time <- Sys.time()
   }
 
