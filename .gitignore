@@ -3,3 +3,5 @@
 .Rproj.user
 *.o
 *.so
+.RData
+.DS_Store
