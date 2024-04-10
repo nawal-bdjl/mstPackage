@@ -103,6 +103,28 @@ one.simu <- function(func = "prim_mst", ajd_matrix = NULL) {
 
 #### Analyse meilleurs / pires des cas 
 
+simulation simple, sur n petit 
+
+```{r}
+n <- 5 
+adj_matrix <- generate_random_adjacency_matrix(n)
+one.simu(func = "prim_mst", adj_matrix)
+one.simu(func = "kruskal_mst", adj_matrix)
+one.simu(func = "prim_mst_rcpp",adj_matrix)
+one.simu(func = "kruskal_mst_rcpp",adj_matrix)
+```
+
+simulation simple, sur n grand : 
+
+```{r}
+n <- 100 
+adj_matrix <- generate_random_adjacency_matrix(n)
+one.simu(func = "prim_mst", adj_matrix)
+one.simu(func = "kruskal_mst", adj_matrix)
+one.simu(func = "prim_mst_rcpp",adj_matrix)
+one.simu(func = "kruskal_mst_rcpp",adj_matrix)
+```
+
 meilleur : sur ACM
 
 ```{r}
@@ -224,7 +246,6 @@ ggplot(size_long, aes(x = size, y = LogTime, color = Algorithm)) +
   theme_minimal()
 ```
 
-
 #### Analyse diverses poids de graphe à densité et taille fixées
 
 
@@ -270,7 +291,212 @@ ggplot(weight_data, aes(x = WeightRange, y = LogTime, group = Algorithm, color =
 ```
 
 
+#### Analyse de différents cas particuliers 
 
+
+Graphe disjoint
+
+```{r}
+# Un graphe avec deux composantes connexes disjointes
+disjoint_graph <- matrix(Inf, nrow=6, ncol=6)
+disjoint_graph[1:3, 1:3] <- 1 # Première composante connexe
+#disjoint_graph[4:6, 4:6] <- 1 # Deuxième composante connexe
+diag(disjoint_graph) <- Inf # Pas de boucles
+
+prim_mst(disjoint_graph)
+kruskal_mst(disjoint_graph)
+prim_mst_rcpp(disjoint_graph)
+kruskal_mst_rcpp(disjoint_graph)
+```
+
+Erreur -> remplacer par warning 
+
+
+Graphe poids uniforme 
+
+```{r}
+# Un graphe complet avec des poids uniformes
+uniform_weight_graph <- matrix(1, nrow=5, ncol=5)
+diag(uniform_weight_graph) <- Inf # Pas de boucles
+
+prim_mst(uniform_weight_graph)
+kruskal_mst(uniform_weight_graph)
+prim_mst_rcpp(uniform_weight_graph)
+kruskal_mst_rcpp(uniform_weight_graph)
+
+one.simu(func = "prim_mst", uniform_weight_graph)
+one.simu(func = "kruskal_mst", uniform_weight_graph)
+one.simu(func = "prim_mst_rcpp",uniform_weight_graph)
+one.simu(func = "kruskal_mst_rcpp",uniform_weight_graph)
+```
+
+
+
+Graphe cycle complet 
+
+```{r}
+# Un cycle complet (chaque sommet connecté à tous les autres)
+complete_cycle_graph <- matrix(2, nrow=5, ncol=5)
+diag(complete_cycle_graph) <- Inf # Pas de boucles
+
+prim_mst(complete_cycle_graph)
+kruskal_mst(complete_cycle_graph)
+prim_mst_rcpp(complete_cycle_graph)
+kruskal_mst_rcpp(complete_cycle_graph)
+
+one.simu(func = "prim_mst", complete_cycle_graph)
+one.simu(func = "kruskal_mst", complete_cycle_graph)
+one.simu(func = "prim_mst_rcpp",complete_cycle_graph)
+one.simu(func = "kruskal_mst_rcpp",complete_cycle_graph)
+```
+
+Graphe étoile 
+
+```{r}
+# Un graphe en étoile avec un nœud central
+star_graph <- matrix(Inf, nrow=5, ncol=5)
+star_graph[1, 2:5] <- 1
+star_graph[2:5, 1] <- 1
+diag(star_graph) <- Inf # Pas de boucles
+
+
+prim_mst(star_graph)
+kruskal_mst(star_graph)
+prim_mst_rcpp(star_graph)
+kruskal_mst_rcpp(star_graph)
+
+one.simu(func = "prim_mst", star_graph)
+one.simu(func = "kruskal_mst", star_graph)
+one.simu(func = "prim_mst_rcpp",star_graph)
+one.simu(func = "kruskal_mst_rcpp",star_graph)
+```
+
+
+Graphe linéaire / chainé
+
+```{r}
+# Un graphe linéaire ou chaîne
+linear_graph <- matrix(Inf, nrow=5, ncol=5)
+linear_graph[row(linear_graph) == col(linear_graph) + 1] <- 1
+linear_graph[row(linear_graph) + 1 == col(linear_graph)] <- 1
+
+prim_mst(linear_graph)
+kruskal_mst(linear_graph)
+prim_mst_rcpp(linear_graph)
+kruskal_mst_rcpp(linear_graph)
+
+one.simu(func = "prim_mst", linear_graph)
+one.simu(func = "kruskal_mst", linear_graph)
+one.simu(func = "prim_mst_rcpp",linear_graph)
+one.simu(func = "kruskal_mst_rcpp",linear_graph)
+```
+
+
+
+Graphe poids extremes 
+
+```{r}
+# Un graphe avec des poids extrêmes
+extreme_weight_graph <- matrix(runif(25, 1, 100), nrow=5)
+extreme_weight_graph <- (extreme_weight_graph + t(extreme_weight_graph)) / 2
+diag(extreme_weight_graph) <- Inf # Pas de boucles
+
+
+prim_mst(extreme_weight_graph)
+kruskal_mst(extreme_weight_graph)
+prim_mst_rcpp(extreme_weight_graph)
+kruskal_mst_rcpp(extreme_weight_graph)
+
+one.simu(func = "prim_mst", extreme_weight_graph)
+one.simu(func = "kruskal_mst", extreme_weight_graph)
+one.simu(func = "prim_mst_rcpp",extreme_weight_graph)
+one.simu(func = "kruskal_mst_rcpp",extreme_weight_graph)
+```
+
+
+
+
+Graphe complet pondérés de facon non uniforme 
+
+```{r}
+# Un graphe complet avec des poids non uniformes
+non_uniform_complete_graph <- matrix(sample(1:10, 25, replace = TRUE), nrow=5)
+non_uniform_complete_graph <- (non_uniform_complete_graph + t(non_uniform_complete_graph)) / 2
+diag(non_uniform_complete_graph) <- Inf # Pas de boucles
+
+prim_mst(non_uniform_complete_graph)
+kruskal_mst(non_uniform_complete_graph)
+prim_mst_rcpp(non_uniform_complete_graph)
+kruskal_mst_rcpp(non_uniform_complete_graph)
+
+one.simu(func = "prim_mst", non_uniform_complete_graph)
+one.simu(func = "kruskal_mst", non_uniform_complete_graph)
+one.simu(func = "prim_mst_rcpp",non_uniform_complete_graph)
+one.simu(func = "kruskal_mst_rcpp",non_uniform_complete_graph)
+```
+
+
+Graphes à Multiples Égalités de Poids Minimal 
+
+```{r}
+
+# Un graphe avec de multiples arêtes ayant le même poids minimal
+multiple_min_weights_graph <- matrix(sample(c(rep(1, 5), 2:10), 25, replace = TRUE), nrow=5)
+multiple_min_weights_graph <- (multiple_min_weights_graph + t(multiple_min_weights_graph)) / 2
+diag(multiple_min_weights_graph) <- Inf # Pas de boucles
+
+
+prim_mst(multiple_min_weights_graph)
+kruskal_mst(multiple_min_weights_graph)
+prim_mst_rcpp(multiple_min_weights_graph)
+kruskal_mst_rcpp(multiple_min_weights_graph)
+
+one.simu(func = "prim_mst", multiple_min_weights_graph)
+one.simu(func = "kruskal_mst", multiple_min_weights_graph)
+one.simu(func = "prim_mst_rcpp",multiple_min_weights_graph)
+one.simu(func = "kruskal_mst_rcpp",multiple_min_weights_graph)
+```
+
+
+
+
+Graphes avec Boucles
+
+```{r}
+# Un graphe avec des boucles (généralement non souhaitables dans un graphe simple)
+graph_with_loops <- matrix(sample(1:10, 25, replace = TRUE), nrow=5)
+graph_with_loops <- (graph_with_loops + t(graph_with_loops)) / 2
+
+prim_mst(graph_with_loops)
+kruskal_mst(graph_with_loops)
+prim_mst_rcpp(graph_with_loops)
+kruskal_mst_rcpp(graph_with_loops)
+
+one.simu(func = "prim_mst", graph_with_loops)
+one.simu(func = "kruskal_mst", graph_with_loops)
+one.simu(func = "prim_mst_rcpp",graph_with_loops)
+one.simu(func = "kruskal_mst_rcpp",graph_with_loops)
+
+```
+
+Graphes avec Poids Négatifs 
+
+```{r}
+# Un graphe avec des poids négatifs (pas standard pour MST)
+negative_weights_graph <- matrix(sample(-10:10, 25, replace = TRUE), nrow=5)
+negative_weights_graph <- (negative_weights_graph + t(negative_weights_graph)) / 2
+diag(negative_weights_graph) <- Inf # Pas de boucles
+
+prim_mst(negative_weights_graph)
+kruskal_mst(negative_weights_graph)
+prim_mst_rcpp(negative_weights_graph)
+kruskal_mst_rcpp(negative_weights_graph)
+
+one.simu(func = "prim_mst", negative_weights_graph)
+one.simu(func = "kruskal_mst", negative_weights_graph)
+one.simu(func = "prim_mst_rcpp",negative_weights_graph)
+one.simu(func = "kruskal_mst_rcpp",negative_weights_graph)
+```
 
 
 
