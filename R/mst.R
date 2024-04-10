@@ -113,6 +113,11 @@ kruskal_mst <- function(adj_matrix) {
     root_y <- find_root(y)
     parent[root_x] <<- root_y
   }
+
+  # Check if the graph is connected
+  if (length(edges) < num_vertices - 1) {
+    warning("Warning: Not possible to output a MST, as the given adjacency matrix does not represent a connected graph.")
+  }
   
   mst_edges <- matrix(0, nrow = num_vertices, ncol = num_vertices)
   mst_weight <- 0
