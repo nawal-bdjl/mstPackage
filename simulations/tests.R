@@ -6,10 +6,9 @@ library(mstPackage)
 library(ggplot2)
 library(microbenchmark)
 
-n <- 10 #data size
-s <- generate_random_adjacency_matrix(n) #generate data
+n <- 10
+s <- generate_random_adjacency_matrix(n)
 
-# the 4 algorithms
 
 prim_mst(s)
 kruskal_mst(s)
@@ -51,25 +50,8 @@ one.simu <- function(func = "prim_mst", ajd_matrix = NULL) {
   return(unclass(end_time - start_time)[1])
 }
 
-# n <- 1000
-# adj_matrix <- generate_random_adjacency_matrix(n)
-# one.simu(func = "kruskal_mst", ajd_matrix)
-
 
 ################################################################################################
-
-
-###########################################################
-############# One time complexity test ####################
-###########################################################
-# #we evaluate the time with a given n for the 4 algorithms
-# n <- 1000
-# adj_matrix <- generate_random_adjacency_matrix(n)
-# one.simu(func = "prim_mst", adj_matrix)
-# one.simu(func = "kruskal_mst", adj_matrix)
-# one.simu(func = "prim_mst_rcpp",adj_matrix)
-# one.simu(func = "kruskal_mst_rcpp",adj_matrix)
-
 
 
 #########################################################################
@@ -101,11 +83,11 @@ time3/time4
 ############# microbenchmark #############
 ##########################################
 
-# n <- 5000
-# adj_matrix <- generate_random_adjacency_matrix(n)
-# res <- microbenchmark(one.simu(func = "prim_mst_rcpp", ajd_matrix), one.simu(func = "kruskal_mst_rcpp"), times = 50, ajd_matrix)
-# autoplot(res)
-# res
+n <- 5000
+adj_matrix <- generate_random_adjacency_matrix(n)
+res <- microbenchmark(one.simu(func = "prim_mst_rcpp", ajd_matrix), one.simu(func = "kruskal_mst_rcpp"), times = 50, ajd_matrix)
+autoplot(res)
+res
 
 
 ##########################################
