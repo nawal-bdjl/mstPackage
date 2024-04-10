@@ -9,11 +9,11 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Minimum Spanning Tree Package 
+# Minimum Spanning Tree Package
 
 ## Introduction
 
-### Contexte - Principe 
+### Contexte - Principe
 
 Le Minimum Spanning Tree (MST) est un arbre couvrant de poids minimal d'un graphe connexe et pondéré. Il s'agit d'un sous-graphe acyclique qui relie tous les sommets du graphe original en minimisant la somme des poids des arêtes.
 
@@ -21,7 +21,7 @@ Il existe plusieurs algorithmes classiques pour trouver le MST d'un graphe, tels
 
 Ce package se veut notamment de résoudre efficacement des problèmes de MST sur des graphes de grande taille, spécifiques à la modélisation dans le domaine de la santé.
 
-### Applications 
+### Applications
 
 Le MST a de nombreuses applications en santé, notamment dans l'analyse de données génomiques et protéomiques [étude à grande échelle des protéines]. Parmi les exemples d'applications en santé nous pouvons citer :
 
@@ -31,7 +31,7 @@ Le MST a de nombreuses applications en santé, notamment dans l'analyse de donn�
 
 -   L'**analyse de données de séquençage**, où le MST est utilisé pour comparer des séquences d'ADN ou d'ARN et identifier les mutations qui les distinguent. En construisant un graphe dont les sommets représentent les séquences et les arêtes représentent les différences entre les séquences, le MST permet de trouver le chemin le plus court qui relie toutes les séquences, ce qui correspond à l'ensemble des mutations qui les séparent.
 
-## Algorithme de Prim 
+## Algorithme de Prim
 
 ### Présentation
 
@@ -59,16 +59,342 @@ L'algorithme de Prim commence par un **sommet arbitraire** et s'étend étape pa
 
 -   **Indépendant du Sommet de Départ** : peu importe le sommet de départ, l'algorithme trouve toujours le même arbre couvrant minimal. Cela montre la fiabilité de l'algorithme pour fournir un résultat consistant et optimal indépendamment de sommet initial choisi.
 
-## Algorithme de Kruskal 
+## Algorithme de Kruskal
 
-## Implémentation des algorithmes en R 
+## Implémentation des algorithmes en R
 
-## Implémentation des algorithmes en Rcpp 
+## Implémentation des algorithmes en Rcpp
 
-## Comparaison 
+## Comparaison
 
-### Comparaison des algorithmes 
+Fonction qui calcule le temps
 
-### Comparaison des langages 
+```{r}
+library(mstPackage)
 
-## Références 
+one.simu <- function(func = "prim_mst", ajd_matrix = NULL) {
+  start_time <- NA
+  end_time <- NA
+
+  if (func == "prim_mst") {
+    start_time <- Sys.time()
+    mst <- prim_mst(adj_matrix)
+    end_time <- Sys.time()
+
+  } else if (func == "kruskal_mst") {
+    start_time <- Sys.time()
+    mst <- kruskal_mst(adj_matrix)
+    end_time <- Sys.time()
+  }
+  else if (func == "kruskal_mst_rcpp") {
+    start_time <- Sys.time()
+    mst <- kruskal_mst_rcpp(adj_matrix)
+    end_time <- Sys.time()
+  }
+  else if (func == "prim_mst_rcpp") {
+    start_time <- Sys.time()
+    mst <- kruskal_mst_rcpp(adj_matrix)
+    end_time <- Sys.time()
+  }
+
+  return(unclass(end_time - start_time)[1])
+}
+```
+
+#### Analyse meilleurs / pires des cas 
+
+meilleur : sur ACM
+
+```{r}
+# Génération de la matrice d'adjacence pour un ACM "optimal" 
+# (où le graphe est déjà un ACM minimal)
+meilleur_acm <- matrix(
+  c(Inf, 1,   Inf, Inf,
+    1,   Inf, 1,   Inf,
+    Inf, 1,   Inf, 1,
+    Inf, Inf, 1,   Inf),
+  nrow = 4, byrow = TRUE
+)
+
+one.simu(func = "prim_mst", meilleur_acm)
+one.simu(func = "kruskal_mst", meilleur_acm)
+one.simu(func = "prim_mst_rcpp",meilleur_acm)
+one.simu(func = "kruskal_mst_rcpp",meilleur_acm)
+```
+
+pire cas : entièrement connexe
+
+```{r}
+pire_cas_prim <- matrix(
+  c(Inf, 2, 3, 4,
+    2, Inf, 5, 6,
+    3, 5, Inf, 7,
+    4, 6, 7, Inf),
+  nrow = 4, byrow = TRUE
+)
+
+one.simu(func = "prim_mst", pire_cas_prim)
+one.simu(func = "kruskal_mst", pire_cas_prim)
+one.simu(func = "prim_mst_rcpp",pire_cas_prim)
+one.simu(func = "kruskal_mst_rcpp",pire_cas_prim)
+```
+
+#### Analyse diverses densités de graphe à taille fixée 
+
+```{r}
+library(tidyr) 
+library(ggplot2)
+library(mstPackage)
+densities <- seq(0.1, 1, by=0.1)
+n <- 100 # Taille du graphe fixe
+
+
+density_results <- matrix(NA, length(densities), 4)
+colnames(density_results) <- c("prim_mst", "kruskal_mst", "prim_mst_rcpp", "kruskal_mst_rcpp")
+
+for (i in 1:length(densities)) {
+  print(round((1 - densities[i]) * n * (n - 1) / 2))
+  adj_matrix <- generate_random_adjacency_matrix(n, num_zeros = round((1 - densities[i]) * n * (n - 1) / 2))
+  
+  # Exécution des simulations pour chaque densité
+  for (func in colnames(density_results)) {
+    density_results[i, func] <- one.simu(func, adj_matrix)
+  }
+}
+
+
+density_df <- as.data.frame(density_results)
+density_df$density <- seq(0.1, 1, by = 0.1)
+
+density_long <- pivot_longer(density_df, cols = c("prim_mst", "kruskal_mst", "prim_mst_rcpp", "kruskal_mst_rcpp"), 
+                             names_to = "Algorithm", values_to = "Time")
+
+density_long$LogTime <- log(density_long$Time)
+
+ggplot(density_long, aes(x = density, y = LogTime, color = Algorithm)) +
+  geom_line() + geom_point() +
+  scale_y_continuous(name = "Log(Time)") +
+  scale_x_continuous(name = "Density") +
+  ggtitle("Impact de la Densité sur le Temps d'Exécution (Log Scale)") +
+  theme_minimal()
+```
+
+#### Analyse diverses tailles de graphe à densité fixée
+
+
+```{r}
+library(tidyr) 
+library(ggplot2)
+library(mstPackage) # Assurez-vous que cette bibliothèque contient les implémentations Rcpp
+
+sizes <- seq(5, 100, by = 10) # Différentes tailles à tester
+density <- 0.5 # Densité constante
+
+# Stockage des résultats
+size_results <- matrix(NA, length(sizes), 4)
+colnames(size_results) <- c("prim_mst", "kruskal_mst", "prim_mst_rcpp", "kruskal_mst_rcpp")
+
+for (i in 1:length(sizes)) {
+  print(sizes[i])
+  adj_matrix <- generate_random_adjacency_matrix(sizes[i], num_zeros = round((1 - density) * sizes[i] * (sizes[i] - 1) / 2))
+  
+  # Exécution des simulations pour chaque taille de graphe
+  for (func in colnames(size_results)) {
+    size_results[i, func] <- one.simu(func, adj_matrix)
+  }
+}
+
+# Convertir les résultats en data frame pour une visualisation avec ggplot2
+size_df <- as.data.frame(size_results)
+size_df$size <- sizes
+
+# Transformer de wide à long format
+size_long <- pivot_longer(size_df, cols = c("prim_mst", "kruskal_mst", "prim_mst_rcpp", "kruskal_mst_rcpp"),
+                          names_to = "Algorithm", values_to = "Time")
+
+# Ajouter une colonne pour l'échelle logarithmique
+size_long$LogTime <- log(size_long$Time)
+
+# Création du graphique
+ggplot(size_long, aes(x = size, y = LogTime, color = Algorithm)) +
+  geom_line() + geom_point() +
+  scale_y_continuous(name = "Log(Time)") +
+  scale_x_continuous(name = "Size of Graph") +
+  ggtitle("Impact de la Taille du Graphe sur le Temps d'Exécution (Log Scale)") +
+  theme_minimal()
+```
+
+
+#### Analyse diverses poids de graphe à densité et taille fixées
+
+
+```{r}
+library(tidyr) 
+library(ggplot2)
+library(mstPackage)
+
+n <- 100 # Taille du graphe fixe
+density <- 0.5 # Densité constante
+
+# plages de poids à tester
+weight_ranges <- list(c(1,10), c(1,20), c(1,50), c(1,100), c(1,200), c(1,500), c(1,1000))
+
+weight_data <- data.frame(Size = integer(),
+                          Algorithm = character(),
+                          Time = numeric(),
+                          LogTime = numeric(),
+                          WeightRange = character())
+
+for (range in weight_ranges) {
+  print(paste("Testing weight range:", range[1], "-", range[2]))
+  adj_matrix <- generate_random_adjacency_matrix(n, num_zeros = round((1 - density) * n * (n - 1) / 2))
+  adj_matrix[adj_matrix != Inf] <- sample(range[1]:range[2], sum(adj_matrix != Inf), replace = TRUE)
+  
+  for (algo in c("prim_mst", "kruskal_mst", "prim_mst_rcpp", "kruskal_mst_rcpp")) {
+    time_taken <- one.simu(algo, adj_matrix)
+    weight_data <- rbind(weight_data, data.frame(Size = n,
+                                                 Algorithm = algo,
+                                                 Time = time_taken,
+                                                 LogTime = log(time_taken),
+                                                 WeightRange = paste(range, collapse = "-")))
+  }
+}
+
+ggplot(weight_data, aes(x = WeightRange, y = LogTime, group = Algorithm, color = Algorithm)) +
+  geom_line() +
+  geom_point() +
+  theme_minimal() +
+  scale_y_continuous(name = "Log(Time)") +
+  scale_x_discrete(name = "Weight Range") +
+  ggtitle("Impact des Plages de Poids sur le Temps d'Exécution (Log Scale)")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+à ranger en dessous
+
+
+
+
+
+
+
+
+
+
+
+Dans cette partie, nous allons pouvoir comparer les temps d'exécution des deux algorithmes, mais aussi des deux langages utilisées : R et C++.
+
+### Comparaison des fonctions
+
+On peut commencer par définir une fonction qui nous permettra de calculer les temps d'exécution de chaque algorithme implémenté, pour les deux langages :
+
+On peut alors calculer pour un n fixé, le temps d'exécution de chaque algorithme, pour une même matrice d'adjacence :
+
+```{r}
+n <- 10
+adj_matrix <- generate_random_adjacency_matrix(n)
+one.simu(func = "prim_mst", adj_matrix)
+one.simu(func = "kruskal_mst", adj_matrix)
+one.simu(func = "prim_mst_rcpp",adj_matrix)
+one.simu(func = "kruskal_mst_rcpp",adj_matrix)
+```
+
+Ainsi, .......
+
+\
+On peut aussi calculer les temps d'éxecution pour un n fixé, en répétant plusieur fois le nombre de réalisation des algorithmes.
+
+```{r}
+nbSimus <- 10
+adj_matrix <- generate_random_adjacency_matrix(100)
+time1 <- 0
+time2 <- 0
+time3 <- 0
+time4 <- 0
+for(i in 1:nbSimus){time1 <- time1 + one.simu(func = "prim_mst", adj_matrix)}
+for(i in 1:nbSimus){time2 <- time2 + one.simu(func = "kruskal_mst", adj_matrix)}
+for(i in 1:nbSimus){time3 <- time3 + one.simu(func = "prim_mst_rcpp", adj_matrix)}
+for(i in 1:nbSimus){time4 <- time4 + one.simu(func = "kruskal_mst_rcpp", adj_matrix)}
+```
+
+On peut alors étudier les vitesses selon le langage ou l'algorithme utilisés :
+
+```{r}
+#gain R -> rcpp
+time1/time3
+time2/time4
+
+#gain prim -> kruskal
+time1/time2
+time3/time4
+
+#max gain
+time1/time4 #à adapter
+
+```
+
+\
+Ainsi ....
+
+On peut ensuite implémenter fonction pour
+
+### Comparaison des algorithmes Prim et Kruskal
+
+### Comparaison des langages
+
+#### En Rcpp
+
+Benchmark
+
+```{r}
+library(microbenchmark)
+library(ggplot2)
+n <- 100
+adj_matrix <- generate_random_adjacency_matrix(n)
+res <- microbenchmark(one.simu(func = "prim_mst_rcpp", ajd_matrix), one.simu(func = "kruskal_mst_rcpp", adj_matrix), times = 50)
+autoplot(res)
+res
+```
+
+```{r}
+res2 <- microbenchmark(one.simu(func = "prim_mst", ajd_matrix), one.simu(func = "kruskal_mst", adj_matrix), times = 50)
+autoplot(res2)
+res2
+```
+
+```{r}
+res3 <- microbenchmark(one.simu(func = "prim_mst_rcpp", ajd_matrix), one.simu(func = "kruskal_mst_rcpp", adj_matrix), one.simu(func = "prim_mst", ajd_matrix), one.simu(func = "kruskal_mst", ajd_matrix), times = 50)
+autoplot(res3)
+res3
+```
+
+Graphique log(n) vs log(T(n))
+
+```{r}
+
+```
+
+```{r}
+n = 5
+a = generate_random_adjacency_matrix(n)
+a
+kruskal_mst(a)
+prim_mst(a)
+```
+
+## Références
