@@ -2,7 +2,7 @@
 
 ### Nawal BENDJELLOUL, Rabab KHATIB, Gabriele PEDRONI
 
-#### M2 Data Science, Université Paris Sackay
+#### M2 Data Science, Université Paris Saclay
 
 ### April 11, 2024
 
